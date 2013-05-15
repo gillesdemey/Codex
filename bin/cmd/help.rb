@@ -1,26 +1,26 @@
-MACKUP_HELP = <<-EOS
+CODEX_HELP = <<-EOS
 Example usage:
-  mackup [info | home | options ] [FORMULA...]
-  mackup install FORMULA...
-  mackup uninstall FORMULA...
-  mackup search [foo]
-  mackup list [FORMULA...]
-  mackup update
-  mackup upgrade [FORMULA...]
+  codex [info | home | options ] [FORMULA...]
+  codex install FORMULA...
+  codex uninstall FORMULA...
+  codex search [foo]
+  codex list [FORMULA...]
+  codex update
+  codex upgrade [FORMULA...]
 
 Troubleshooting:
-  mackup doctor
-  mackup install -vd FORMULA
-  mackup [--env | --config]
+  codex doctor
+  codex install -vd FORMULA
+  codex [--env | --config]
 
-mackuping:
-  mackup create [URL [--no-fetch]]
-  mackup edit [FORMULA...]
-  open https://github.com/mxcl/homemackup/wiki/Formula-Cookbook
+Codexing:
+  codex create [URL [--no-fetch]]
+  codex edit [FORMULA...]
+  open https://github.com/mxcl/homecodex/wiki/Formula-Cookbook
 
 Further help:
-  man mackup
-  mackup home
+  man codex
+  codex home
 EOS
 
 # NOTE Keep the lenth of vanilla --help less than 25 lines!
@@ -30,11 +30,11 @@ EOS
 # NOTE Keep lines less than 80 characters! Wrapping is just not cricket.
 # NOTE The reason the string is at the top is so 25 lines is easy to measure!
 
-module Mackup extend self
+module Codex extend self
   def help
-    puts MACKUP_HELP
+    puts CODEX_HELP
   end
   def help_s
-    MACKUP_HELP
+    CODEX_HELP
   end
 end
