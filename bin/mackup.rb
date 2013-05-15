@@ -22,7 +22,7 @@ RESTORE_W = 'restore'
 
 PREFERENCES = '~/Library/Preferences/'
 APP_SUPPORT = '~/Library/Application Support/'
-FORMULA_PATH = 'Library/Formula/'
+MANUSCRIPT_PATH = 'Library/Manuscript/'
 
 # Configuration
 
@@ -100,7 +100,7 @@ end
 
 # Discover all installed formulas
 def discoverFormulas
-  $formulas = Dir.glob("#{FORMULA_PATH}*.js")
+  $formulas = Dir.glob("#{MANUSCRIPT_PATH}*.js")
   puts $formulas
 end
 
