@@ -6,6 +6,7 @@
 # codex [backup | restore ] [FORMULA...]      #
 ###############################################
 
+require 'json'
 
 #############
 # Constants #
@@ -19,18 +20,21 @@ RESTORE_W = 'restore'
 REVERT_W = 'uninstall'
 UPDATE_W = 'update'
 
-# Common paths
-
-PREFERENCES = '~/Library/Preferences/'
-APP_SUPPORT = '~/Library/Application Support/'
-MANUSCRIPT_PATH = 'Library/Manuscript/'
-
 #################
 # Configuration #
 #################
 
 $formulas = []
 $supported_apps = []
+$config = JSON.load( IO.read('config/config.js') )
+
+# Common paths
+PREFERENCES = '~/Library/Preferences/'
+APP_SUPPORT = '~/Library/Application Support/'
+MANUSCRIPT_PATH = 'Library/Manuscript/'
+
+DROPBOX_FOLDER = $config['dropbox_folder'].gsub("~", Dir.home)
+CODEX_FOLDER  = DROPBOX_FOLDER + $config['codex_folder']
 
 ########################
 # Command Line Options #
@@ -68,7 +72,6 @@ end
 
 # Load a certain formula into the supported apps global
 def loadFormula(f)
-  require 'json'
   $supported_apps << JSON.load( IO.read(f) )
 end
 
@@ -78,6 +81,23 @@ def discoverFormulas
   update
   $formulas = Dir.glob("#{MANUSCRIPT_PATH}*.js")
   puts "[discoverFormulas - $formulas]: #{$formulas}"
+end
+
+def update
+
+end
+
+# Make sure all folders are in place
+def setup
+  if not File.directory? "#{DROPBOX_FOLDER}"
+    puts "No dropbox folder found! Please update your config file!"
+    exit 0
+  else
+    if not File.directory? "#{CODEX_FOLDER}"
+      puts "No codex folder found, creating..."
+      Dir.mkdir "#{CODEX_FOLDER}"
+    end
+  end
 end
 
 ####################
@@ -102,6 +122,7 @@ end
 
 begin
 
+  setup
   discoverFormulas
   getFormulas
 
