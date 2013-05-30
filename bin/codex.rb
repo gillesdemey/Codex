@@ -17,6 +17,7 @@ CODEX_VERSION = '0.1'
 BACKUP_W = 'backup'
 RESTORE_W = 'restore'
 REVERT_W = 'uninstall'
+UPDATE_W = 'update'
 
 # Common paths
 
@@ -36,24 +37,24 @@ $supported_apps = []
 ########################
 
 case ARGV.first
-when '-h', '--help', '--usage', '-?', 'help', nil
-  require_relative 'cmd/help'
-  Codex.help
-  exit ARGV.first ? 0 : 1
-when '--version'
-  puts CODEX_VERSION
-  exit 0
-when '-v'
-  puts "Codex v#{CODEX_VERSION}"
+  when '-h', '--help', '--usage', '-?', 'help', nil
+    require_relative 'cmd/help'
+    Codex.help
+    exit ARGV.first ? 0 : 1
+  when '--version'
+    puts CODEX_VERSION
+    exit 0
+  when '-v'
+    puts "Codex v#{CODEX_VERSION}"
     # Shift the -v to the end of the parameter list
     ARGV << ARGV.shift
     # If no other arguments, just quit here.
     exit 0 if ARGV.length == 1
 end
 
-# Functions
-
-# TODO: fetch list of apps from the git repo
+#############
+# Functions #
+#############
 
 # Load all installed formulas
 def getFormulas
@@ -62,7 +63,7 @@ def getFormulas
     loadFormula(f)
   end
 
-  puts $supported_apps
+  puts "[getFormulas - $supported_apps]: #{$supported_apps}"
 end
 
 # Load a certain formula into the supported apps global
@@ -72,9 +73,11 @@ def loadFormula(f)
 end
 
 # Discover all installed formulas
+# TODO: Fetch formulas from git repo
 def discoverFormulas
+  update
   $formulas = Dir.glob("#{MANUSCRIPT_PATH}*.js")
-  puts $formulas
+  puts "[discoverFormulas - $formulas]: #{$formulas}"
 end
 
 ####################
@@ -89,26 +92,41 @@ def isSameFile(left, right)
   left_hash === right_hash
 end
 
+def update
+  puts "Updating codex..."
+end
+
+#########
+# Begin #
+#########
+
 begin
 
   discoverFormulas
   getFormulas
 
-  case ARGV[0]
-  when BACKUP_W
-    #backup($formulas)
-  when RESTORE_W
-    #restore($formulas)
-  else
-    puts "Please choose '#{BACKUP_W}' or '#{RESTORE_W}'"
+  case ARGV.first
+    when BACKUP_W
+      #backup($formulas)
+    when RESTORE_W
+      #restore($formulas)
+    when REVERT_W
+      uninstall
+    when UPDATE_W
+      update
+    else
+      puts "Please choose '#{BACKUP_W}' or '#{RESTORE_W}'"
   end
 
   # Find requested formula in formulas list
-  if $formulas.any? {|k, v| k.include? ARGV[1]}
-    form = $formulas.select {|k, v| $formulas.include? ARGV[1]}
-    puts form
-  else
-    puts "Formula #{ARGV[1]} not found."
+  if ARGV[1]
+    if $formulas.any? {|k, v| k.include? ARGV[1]}
+      form = $formulas.select {|k, v| $formulas.include? ARGV[1]}
+      puts form
+      loadFormula ARGV[1]
+    else
+      puts "Formula #{ARGV[1]} not found."
+    end
   end
 
 end
