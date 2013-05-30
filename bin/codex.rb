@@ -83,7 +83,29 @@ def discoverFormulas
   puts "[discoverFormulas - $formulas]: #{$formulas}"
 end
 
-def update
+# Backup the application config files
+#
+#   Algorithm:
+#     if exists home/file
+#       if home/file is a real file
+#         if exists mackup/file
+#           are you sure ?
+#           if sure
+#             rm mackup/file
+#             mv home/file mackup/file
+#             link mackup/file home/file
+#         else
+#           mv home/file mackup/file
+#           link mackup/file home/file
+def backup
+
+  if $supported_apps.instance_of? Array
+
+    $supported_apps.each do |app|
+      puts "Backing up #{app['name']}..."
+    end
+
+  end
 
 end
 
@@ -123,31 +145,32 @@ end
 begin
 
   setup
+
   discoverFormulas
-  getFormulas
+
+  # Find requested formula in formulas list
+  if ARGV[1]
+    if $formulas.any? {|k, v| k.include? ARGV[1]}
+      form = $formulas.select {|k, v| $formulas.include? ARGV[1]}
+      $supported_apps = form
+    else
+      puts "Formula #{ARGV[1]} not found."
+    end
+  else
+    getFormulas
+  end
 
   case ARGV.first
     when BACKUP_W
-      #backup($formulas)
+      backup
     when RESTORE_W
-      #restore($formulas)
+      restore
     when REVERT_W
       uninstall
     when UPDATE_W
       update
     else
       puts "Please choose '#{BACKUP_W}' or '#{RESTORE_W}'"
-  end
-
-  # Find requested formula in formulas list
-  if ARGV[1]
-    if $formulas.any? {|k, v| k.include? ARGV[1]}
-      form = $formulas.select {|k, v| $formulas.include? ARGV[1]}
-      puts form
-      loadFormula ARGV[1]
-    else
-      puts "Formula #{ARGV[1]} not found."
-    end
   end
 
 end
