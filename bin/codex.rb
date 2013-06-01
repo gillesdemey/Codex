@@ -23,7 +23,7 @@ CODEX_VERSION = '0.1'
 COMMANDS = {
   backup: 'backup',
   restore: 'restore',
-  revert: 'uninstall',
+  unlink: 'unlink',
   update: 'update'
 }
 
@@ -119,9 +119,9 @@ begin
     when COMMANDS[:backup]
       Codex.backup
     when COMMANDS[:restore]
-      restore
-    when COMMANDS[:revert]
-      uninstall
+      Codex.restore
+    when COMMANDS[:unlink]
+      Codex.unlink
     when COMMANDS[:update]
       Formulas.updateFormulas
     else

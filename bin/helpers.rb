@@ -13,7 +13,7 @@ module Codex extend self
   end
 
   def tildeToHomeFolder(folder)
-    return folder.gsub("~", Dir.home)
+    folder.gsub("~", Dir.home)
   end
 
   def getType(path)
@@ -29,19 +29,23 @@ module Codex extend self
   end
 
   def getCodexPath(path)
-    return "#{CODEX_FOLDER}/#{File.basename path}"
+    "#{CODEX_FOLDER}/#{File.basename path}"
   end
 
   def normalizeString(string)
-    return string.strip.downcase.gsub(' ', '')
+    string.strip.downcase.gsub(' ', '')
   end
 
   def parentDirectory(path)
-    return File.expand_path("..", path)
+    File.expand_path("..", path)
   end
 
   def alreadyBackedUp(folder)
     File.exists? Codex.getCodexPath(folder)
+  end
+
+  def alreadyRestored(folder)
+    File.symlink? Codex.folderToFile folder
   end
 
   # check if application is installed
@@ -54,6 +58,10 @@ module Codex extend self
       end
     end
     return installed
+  end
+
+  def folderToFile(path)
+    path.chomp('/')
   end
 
 end
