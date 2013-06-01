@@ -17,10 +17,13 @@ require_relative 'helpers.rb'
 CODEX_VERSION = '0.1'
 
 # Words used to trigger actions
-BACKUP_W = 'backup'
-RESTORE_W = 'restore'
-REVERT_W = 'uninstall'
-UPDATE_W = 'update'
+
+COMMANDS = {
+  backup: 'backup',
+  restore: 'restore',
+  revert: 'uninstall',
+  update: 'update'
+}
 
 #################
 # Configuration #
@@ -69,7 +72,7 @@ def getFormulas
     loadFormula(f)
   end
 
-  puts "[getFormulas - $supported_apps]: #{$supported_apps}"
+  #puts "[getFormulas - $supported_apps]: #{$supported_apps}"
 end
 
 # Load a certain formula into the supported apps global
@@ -82,7 +85,7 @@ end
 def discoverFormulas
   Codex.update
   $formulas = Dir.glob("#{MANUSCRIPT_PATH}*.js")
-  puts "[discoverFormulas - $formulas]: #{$formulas}"
+  #puts "[discoverFormulas - $formulas]: #{$formulas}"
 end
 
 # Backup the application config files
@@ -115,7 +118,7 @@ def backup
 
         type = Codex.getType path
 
-        puts "#{path} is a #{type.nil? ? 'not found' : type}"
+        #puts "#{path} is a #{type.nil? ? 'not found' : type}"
 
         if not type.nil?
 
@@ -127,6 +130,8 @@ def backup
             FileUtils.move(path, codex_path)
             # link back to original location
             FileUtils.symlink(codex_path, File.expand_path("..", path))
+            # done!
+            puts "#{app['name']} is secured in the cloud!"
           end
 
         end
@@ -150,7 +155,7 @@ def setup
     exit 0
   else
     if not File.directory? "#{CODEX_FOLDER}"
-      puts "No codex folder found, creating..."
+      #puts "No codex folder found, creating..."
       Dir.mkdir "#{CODEX_FOLDER}"
     end
   end
@@ -168,27 +173,38 @@ begin
 
   # Find requested formula in formulas list
   if ARGV[1]
-    if $formulas.any? {|k, v| k.include? ARGV[1]}
-      form = $formulas.select {|k, v| $formulas.include? ARGV[1]}
-      $supported_apps = form
+
+    formula = nil
+
+    $formulas.each do |f|
+      if File.basename(f, '.*') === ARGV[1].strip.downcase.gsub(' ', '')
+        #puts "Formula #{f_name} found!"
+        formula = f
+      end
+    end
+
+    if not formula.nil?
+      #puts formula
+      loadFormula(formula)
     else
       puts "Formula #{ARGV[1]} not found."
     end
+
   else
     getFormulas
   end
 
   case ARGV.first
-    when BACKUP_W
+    when COMMANDS[:backup]
       backup
-    when RESTORE_W
+    when COMMANDS[:restore]
       restore
-    when REVERT_W
+    when COMMANDS[:revert]
       uninstall
-    when UPDATE_W
+    when COMMANDS[:update]
       update
     else
-      puts "Please choose '#{BACKUP_W}' or '#{RESTORE_W}'"
+      puts "Please choose #{COMMANDS.values}"
   end
 
 end
