@@ -9,6 +9,7 @@
 require 'json'
 require 'fileutils'
 require_relative 'helpers.rb'
+require_relative 'commands.rb'
 
 #############
 # Constants #
@@ -88,62 +89,6 @@ def discoverFormulas
   #puts "[discoverFormulas - $formulas]: #{$formulas}"
 end
 
-# Backup the application config files
-#
-#   Algorithm:
-#     if exists home/file
-#       if home/file is a real file
-#         if exists .codex/file
-#           are you sure ?
-#           if sure
-#             rm .codex/file
-#             mv home/file .codex/file
-#             link .codex/file home/file
-#         else
-#           mv home/file .codex/file
-#           link .codex/file home/file
-def backup
-
-  if $supported_apps.instance_of? Array
-
-    $supported_apps.each do |app|
-      puts "Backing up #{app['name']}..."
-
-      app['paths'].each do |path|
-
-        path = Codex.tildeToHomeFolder path
-        codex_path = Codex.getCodexPath(path)
-
-        file = File.basename path
-
-        type = Codex.getType path
-
-        #puts "#{path} is a #{type.nil? ? 'not found' : type}"
-
-        if not type.nil?
-
-          # Check if file does not already exist
-          if alreadyBackedUp codex_path
-            puts "#{type} #{path} is already backed up. Continue?"
-          else
-            # move file to codex folder
-            FileUtils.move(path, codex_path)
-            # link back to original location
-            FileUtils.symlink(codex_path, File.expand_path("..", path))
-            # done!
-            puts "#{app['name']} is secured in the cloud!"
-          end
-
-        end
-
-      end
-
-    end
-
-  end
-
-end
-
 def alreadyBackedUp(folder)
   File.exists? Codex.getCodexPath(folder)
 end
@@ -151,7 +96,7 @@ end
 # Make sure all folders are in place
 def setup
   if not File.directory? "#{DROPBOX_FOLDER}"
-    puts "No dropbox folder found! Please update your config file!"
+    puts "No dropbox folder found. Please update your config file."
     exit 0
   else
     if not File.directory? "#{CODEX_FOLDER}"
@@ -171,13 +116,13 @@ begin
 
   discoverFormulas
 
-  # Find requested formula in formulas list
+  # Formula specified, find requested formula in formulas list
   if ARGV[1]
 
     formula = nil
 
     $formulas.each do |f|
-      if File.basename(f, '.*') === ARGV[1].strip.downcase.gsub(' ', '')
+      if File.basename(f, '.*') === Codex.normalizeString(ARGV[1])
         #puts "Formula #{f_name} found!"
         formula = f
       end
@@ -191,12 +136,13 @@ begin
     end
 
   else
+    # no formula specified, load all of them
     getFormulas
   end
 
   case ARGV.first
     when COMMANDS[:backup]
-      backup
+      Codex.backup
     when COMMANDS[:restore]
       restore
     when COMMANDS[:revert]

@@ -36,4 +36,8 @@ module Codex extend self
     return "#{CODEX_FOLDER}/#{File.basename path}"
   end
 
+  def normalizeString(string)
+    return string.strip.downcase.gsub(' ', '')
+  end
+
 end
