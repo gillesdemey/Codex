@@ -32,7 +32,7 @@ COMMANDS = {
 #################
 
 $formulas = []
-$supported_apps = []
+$loaded_apps = []
 $config = JSON.load( IO.read('config/config.js') )
 
 # Common paths
@@ -67,10 +67,6 @@ end
 # Functions #
 #############
 
-def alreadyBackedUp(folder)
-  File.exists? Codex.getCodexPath(folder)
-end
-
 # Make sure all folders are in place
 def setup
   if not File.directory? "#{DROPBOX_FOLDER}"
@@ -92,7 +88,7 @@ begin
 
   setup
 
-  Codex.discoverFormulas
+  Formulas.discoverFormulas
 
   # Formula specified, find requested formula in formulas list
   if ARGV[1]
@@ -108,14 +104,15 @@ begin
 
     if not formula.nil?
       #puts formula
-      Codex.loadFormula(formula)
+      Formulas.loadFormula(formula)
     else
       puts "Formula #{ARGV[1]} not found."
+      exit 0
     end
 
   else
     # no formula specified, load all of them
-    Codex.loadAllFormulas
+    Formulas.loadAllFormulas
   end
 
   case ARGV.first
@@ -126,7 +123,7 @@ begin
     when COMMANDS[:revert]
       uninstall
     when COMMANDS[:update]
-      Codex.updateFormulas
+      Formulas.updateFormulas
     else
       #puts "Please choose #{COMMANDS.values}"
       require_relative 'cmd/help'

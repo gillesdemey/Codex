@@ -1,4 +1,4 @@
-module Codex extend self
+module Formulas extend self
 
   # Load all installed formulas
   def loadAllFormulas
@@ -7,12 +7,12 @@ module Codex extend self
       loadFormula(f)
     end
 
-    #puts "[getFormulas - $supported_apps]: #{$supported_apps}"
+    #puts "[getFormulas - $loaded_apps]: #{$loaded_apps}"
   end
 
   # Load a certain formula into the supported apps global
   def loadFormula(f)
-    $supported_apps << JSON.load( IO.read(f) )
+    $loaded_apps << JSON.load( IO.read(f) )
   end
 
   # Discover all installed formulas
@@ -29,18 +29,6 @@ module Codex extend self
   # TODO: write update formulas function
   def updateFormulas
     puts "Fetching formulas..."
-  end
-
-  # check if application is installed
-  # at least one file in paths has to match
-  def isInstalled(app)
-    installed = false
-    app['paths'].each do |path|
-      if File.exists? Codex.tildeToHomeFolder(path)
-        installed = true
-      end
-    end
-    return installed
   end
 
 end

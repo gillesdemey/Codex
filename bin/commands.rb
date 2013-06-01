@@ -23,11 +23,12 @@ module Codex extend self
   #
   def backup
 
+    # keep an array of errors
     errors = []
 
-    if $supported_apps.instance_of? Array
+    if $loaded_apps.instance_of? Array
 
-      $supported_apps.each do |app|
+      $loaded_apps.each do |app|
 
         if Codex.isInstalled app
 
@@ -36,51 +37,67 @@ module Codex extend self
             path = Codex.tildeToHomeFolder path
             codex_path = Codex.getCodexPath(path)
 
-            type = Codex.getType path
-
             #puts "#{path} is a #{type.nil? ? 'not found' : type}"
 
-            if not type.nil?
+            # the file/directory was found
+            if not Codex.getType(path).nil?
 
-              puts "Backing up #{app['name']}..."
+              #puts "Backing up #{app['name']}..."
 
               # Check if file does not already exist
-              if alreadyBackedUp codex_path
-                #puts "#{type} #{path} is already backed up. Continue?"
-                puts "\u2714 #{app['name']} is already safe in the cloud."
-              else
+              if not Codex.alreadyBackedUp codex_path
+
                 begin
                   # move file to codex folder
                   FileUtils.move(path, codex_path)
                   # link back to original location
-                  FileUtils.symlink(codex_path, File.expand_path("..", path))
+                  FileUtils.symlink(codex_path, Codex.parentDirectory)
                   # done!
                   puts "\u2714 #{app['name']} is secured in the cloud!"
                 rescue
+                  # TODO: write rescue code to ensure no data was lost!
                   puts "\2757 something terrible went wrong! #{$!}"
                 end
+
+              else
+                puts "\u2714 #{app['name']} is already safe in the cloud."
               end
 
             end
 
           end
 
-          if errors.empty?
-            puts "Your application settings are secured in the cloud!"
-          else
-            puts "Your application settings are secured in the cloud, but with #{errors.length} errors."
-          end
-
         else
-          puts "You don't have #{app['name']} installed."
+          if $loaded_apps.size === 1
+            puts "You don't have #{app['name']} installed."
+            exit 0
+          end
         end
 
       end
 
     end
 
+    if errors.empty?
+      puts "\u2714 Your application settings are secured in the cloud!"
+    else
+      puts "\2757 Your application settings are secured in the cloud, but with #{errors.length} errors."
+    end
+
   end
 
+  # Restore the application config files
+  #
+  #  Algorithm:
+  #
+  #     if exists .codex/file
+  #       if exists home/file
+  #         are you sure ?
+  #         if sure
+  #           rm home/file
+  #           link .codex/file home/file
+  #       else
+  #         link .codex/file home/file
   def restore
 
   end
