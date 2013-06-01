@@ -1,0 +1,4 @@
+{
+  "name": "tmuxinator",
+  "paths": ["~/.tmuxinator"]
+}

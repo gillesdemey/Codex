@@ -12,10 +12,6 @@ module Codex extend self
     left_hash === right_hash
   end
 
-  def update
-    puts "Updating codex..."
-  end
-
   def tildeToHomeFolder(folder)
     return folder.gsub("~", Dir.home)
   end

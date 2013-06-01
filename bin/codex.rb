@@ -1,5 +1,5 @@
 #!/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby -W0
-# encoding: UTF-8
+# encoding: utf-8
 
 ###############################################
 # USAGE:                                      #
@@ -10,6 +10,7 @@ require 'json'
 require 'fileutils'
 require_relative 'helpers.rb'
 require_relative 'commands.rb'
+require_relative 'formulas.rb'
 
 #############
 # Constants #
@@ -66,29 +67,6 @@ end
 # Functions #
 #############
 
-# Load all installed formulas
-def getFormulas
-
-  $formulas.each do |f|
-    loadFormula(f)
-  end
-
-  #puts "[getFormulas - $supported_apps]: #{$supported_apps}"
-end
-
-# Load a certain formula into the supported apps global
-def loadFormula(f)
-  $supported_apps << JSON.load( IO.read(f) )
-end
-
-# Discover all installed formulas
-# TODO: Fetch formulas from git repo
-def discoverFormulas
-  Codex.update
-  $formulas = Dir.glob("#{MANUSCRIPT_PATH}*.js")
-  #puts "[discoverFormulas - $formulas]: #{$formulas}"
-end
-
 def alreadyBackedUp(folder)
   File.exists? Codex.getCodexPath(folder)
 end
@@ -114,7 +92,7 @@ begin
 
   setup
 
-  discoverFormulas
+  Codex.discoverFormulas
 
   # Formula specified, find requested formula in formulas list
   if ARGV[1]
@@ -130,14 +108,14 @@ begin
 
     if not formula.nil?
       #puts formula
-      loadFormula(formula)
+      Codex.loadFormula(formula)
     else
       puts "Formula #{ARGV[1]} not found."
     end
 
   else
     # no formula specified, load all of them
-    getFormulas
+    Codex.loadAllFormulas
   end
 
   case ARGV.first
@@ -148,9 +126,12 @@ begin
     when COMMANDS[:revert]
       uninstall
     when COMMANDS[:update]
-      update
+      Codex.updateFormulas
     else
-      puts "Please choose #{COMMANDS.values}"
+      #puts "Please choose #{COMMANDS.values}"
+      require_relative 'cmd/help'
+      Codex.help
+      exit 0
   end
 
 end
