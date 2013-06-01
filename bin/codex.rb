@@ -7,6 +7,8 @@
 ###############################################
 
 require 'json'
+require 'fileutils'
+require_relative 'helpers.rb'
 
 #############
 # Constants #
@@ -33,7 +35,7 @@ PREFERENCES = '~/Library/Preferences/'
 APP_SUPPORT = '~/Library/Application Support/'
 MANUSCRIPT_PATH = 'Library/Manuscript/'
 
-DROPBOX_FOLDER = $config['dropbox_folder'].gsub("~", Dir.home)
+DROPBOX_FOLDER = Codex.tildeToHomeFolder($config['dropbox_folder'])
 CODEX_FOLDER  = DROPBOX_FOLDER + $config['codex_folder']
 
 ########################
@@ -78,7 +80,7 @@ end
 # Discover all installed formulas
 # TODO: Fetch formulas from git repo
 def discoverFormulas
-  update
+  Codex.update
   $formulas = Dir.glob("#{MANUSCRIPT_PATH}*.js")
   puts "[discoverFormulas - $formulas]: #{$formulas}"
 end
@@ -88,25 +90,57 @@ end
 #   Algorithm:
 #     if exists home/file
 #       if home/file is a real file
-#         if exists mackup/file
+#         if exists .codex/file
 #           are you sure ?
 #           if sure
-#             rm mackup/file
-#             mv home/file mackup/file
-#             link mackup/file home/file
+#             rm .codex/file
+#             mv home/file .codex/file
+#             link .codex/file home/file
 #         else
-#           mv home/file mackup/file
-#           link mackup/file home/file
+#           mv home/file .codex/file
+#           link .codex/file home/file
 def backup
 
   if $supported_apps.instance_of? Array
 
     $supported_apps.each do |app|
       puts "Backing up #{app['name']}..."
+
+      app['paths'].each do |path|
+
+        path = Codex.tildeToHomeFolder path
+        codex_path = Codex.getCodexPath(path)
+
+        file = File.basename path
+
+        type = Codex.getType path
+
+        puts "#{path} is a #{type.nil? ? 'not found' : type}"
+
+        if not type.nil?
+
+          # Check if file does not already exist
+          if alreadyBackedUp codex_path
+            puts "#{type} #{path} is already backed up. Continue?"
+          else
+            # move file to codex folder
+            FileUtils.move(path, codex_path)
+            # link back to original location
+            FileUtils.symlink(codex_path, File.expand_path("..", path))
+          end
+
+        end
+
+      end
+
     end
 
   end
 
+end
+
+def alreadyBackedUp(folder)
+  File.exists? Codex.getCodexPath(folder)
 end
 
 # Make sure all folders are in place
@@ -120,22 +154,6 @@ def setup
       Dir.mkdir "#{CODEX_FOLDER}"
     end
   end
-end
-
-####################
-# Helper Functions #
-####################
-
-def isSameFile(left, right)
-  require 'digest/md5'
-  left_hash = Digest::MD5.file(left)
-  right_hash = Digest::MD5.file(right)
-
-  left_hash === right_hash
-end
-
-def update
-  puts "Updating codex..."
 end
 
 #########

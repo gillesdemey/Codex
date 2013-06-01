@@ -1,8 +1,8 @@
 {
   "name": "zsh",
-  "paths": [".zshenv",
-            ".zprofile",
-            ".zshrc",
-            ".zlogin",
-            ".zlogout"]
+  "paths": ["~/.zshenv",
+            "~/.zprofile",
+            "~/.zshrc",
+            "~/.zlogin",
+            "~/.zlogout"]
 }
