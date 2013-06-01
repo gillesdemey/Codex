@@ -1,5 +1,7 @@
 module Formulas extend self
 
+  require_relative 'lib/os.rb'
+
   # Load all installed formulas
   def loadAllFormulas
 
@@ -19,7 +21,7 @@ module Formulas extend self
   # TODO: Fetch formulas from git repo
   def discoverFormulas
     begin
-      $formulas = Dir.glob("#{MANUSCRIPT_PATH}*.js")
+      $formulas = Dir.glob("#{MANUSCRIPT_PATH}/#{OS.name}/*.js")
       #puts "[discoverFormulas - $formulas]: #{$formulas}"
     rescue
       puts "\2757 Couldn't discover formulas. #{$!}"

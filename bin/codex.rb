@@ -38,7 +38,7 @@ $config = JSON.load( IO.read('config/config.js') )
 # Common paths
 PREFERENCES = '~/Library/Preferences/'
 APP_SUPPORT = '~/Library/Application Support/'
-MANUSCRIPT_PATH = 'Library/Manuscript/'
+MANUSCRIPT_PATH = 'Library/Manuscripts/'
 
 DROPBOX_FOLDER = Codex.tildeToHomeFolder($config['dropbox_folder'])
 CODEX_FOLDER  = DROPBOX_FOLDER + $config['codex_folder']
