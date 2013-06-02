@@ -31,28 +31,30 @@ backup
 ----
 
 ```
-ruby bin/codex.rb backup
+ruby bin/codex.rb backup [application]
 ```
 
-This function will move all the installed applications that are compatible with Codex to your dropbox folder
-
-Single application functions are also available.
-
-```
-ruby bin/codex.rb backup zsh
-```
+This function will **move all the installed applications settings** that Codex has a Manuscript for to your codex folder **and link the folders**.
 
 restore
 ----
 
 ```
-ruby bin/codex.rb restore
+ruby bin/codex.rb restore [application]
 ```
 
-This function will restore all your application settings from your dropbox folder to your local system
+This function will restore all your application settings from your codex folder to your local system and **link them**.
+
+Usually this command is run on the second computer, to restore application settings.
+
+Not necessary to run on the same computer unless something went wrong while unlinking.
+
+
+unlink
+----
 
 ```
-ruby bin/codex.rb restore sublimetext2
+ruby bin/codex.rb unlink [application]
 ```
 
-Single application functions are also available.
+This function will restore all your application settings from your dropbox folder to your local system, **your settings will still be in your codex folder**, but they will no longer be linked.
