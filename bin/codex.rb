@@ -117,11 +117,11 @@ begin
 
   case ARGV.first
     when COMMANDS[:backup]
-      Codex.backup
+      Codex.executeCommand('backup')
     when COMMANDS[:restore]
-      Codex.restore
+      Codex.executeCommand('restore')
     when COMMANDS[:unlink]
-      Codex.unlink
+      Codex.executeCommand('unlink')
     when COMMANDS[:update]
       Formulas.updateFormulas
     else

@@ -31,7 +31,6 @@ module Formulas extend self
   def discoverFormulas
     begin
       $formulas = Dir.glob("#{MANUSCRIPT_PATH}/#{OS.name}/*.js")
-      #puts "[discoverFormulas - $formulas]: #{$formulas}"
     rescue
       puts "\2757 Couldn't discover formulas. #{$!}"
     end

@@ -6,6 +6,33 @@
 
 module Codex extend self
 
+  def executeCommand(cmd)
+
+    if not $loaded_apps.empty?
+
+      $loaded_apps.each do |app|
+
+        if Codex.isInstalled app
+
+          case cmd
+            when 'backup'
+              backup(app)
+            when 'restore'
+              restore(app)
+            when 'unlink'
+              unlink(app)
+          end
+
+          #TODO: verbose output that everythign was ok, or errors happend
+
+        end
+
+      end
+
+    end
+
+  end
+
   # Backup the application config files
   #
   #   Algorithm:
@@ -21,71 +48,35 @@ module Codex extend self
   #           mv home/file .codex/file
   #           link .codex/file home/file
   #
-  def backup
+  def backup(app)
 
-    # keep an array of errors
     errors = []
 
-    if not $loaded_apps.empty?
+    if not Codex.alreadyBackedUp app
 
-      $loaded_apps.each do |app|
+      app['paths'].each do |path|
 
-        if Codex.isInstalled app
+        path = Codex.tildeToHomeFolder(path)
+        codex_path = Codex.getCodexPath(path)
 
-          app['paths'].each do |path|
-
-            path = Codex.tildeToHomeFolder path
-            codex_path = Codex.getCodexPath(path)
-
-            #puts "#{path} is a #{type.nil? ? 'not found' : type}"
-
-            # the file/directory was found
-            if not Codex.getType(path).nil?
-
-              #puts "Backing up #{app['name']}..."
-
-              # Check if file does not already exist
-              if not Codex.alreadyBackedUp codex_path
-
-                begin
-                  # move file to codex folder
-                  FileUtils.move(path, codex_path)
-                  # link back to original location
-                  FileUtils.symlink(codex_path, Codex.parentDirectory(path))
-                  # done!
-                  puts "\u2714 #{app['name']} is secured in the cloud!"
-                rescue
-                  # TODO: write rescue code to ensure no data was lost!
-                  puts "\2757 something went wrong! #{$!}"
-                  errors << $!
-                  $loaded_apps.delete(app)
-                end
-
-              else
-                puts "\u2714 #{app['name']} is already safe in the cloud. Use --force to overwrite."
-              end
-
-            end
-
-          end
-
-        else
-          # application seems not installed
-          if $loaded_apps.size === 1
-            puts "You don't seem to have #{app['name']} installed."
-            exit 0
-          end
+        begin
+          # move file to codex folder
+          FileUtils.move(path, codex_path)
+          # link back to original location
+          FileUtils.symlink(codex_path, Codex.parentDirectory(path))
+          # done!
+          puts "\u2714 #{app['name']} is secured in the cloud!"
+        rescue
+          # TODO: write rescue code to ensure no data was lost!
+          puts "\2757 something went wrong! #{$!}"
+          errors << $!
           $loaded_apps.delete(app)
         end
 
       end
 
-    end
-
-    if errors.empty?
-      puts "\u2714 #{$loaded_apps.size} application(s) are secured in the cloud!"
     else
-      puts "\u2757 #{$loaded_apps.size} application(s) are secured in the cloud, but with #{errors.length} error(s)."
+      puts "\u2714 #{app['name']} is already safe in the cloud."
     end
 
   end
@@ -102,70 +93,42 @@ module Codex extend self
   #           link .codex/file home/file
   #       else
   #         link .codex/file home/file
-  def restore
+  def restore(app)
 
-    # keep an array of errors
     errors = []
-    restored_apps = []
 
-    if not $loaded_apps.empty?
+    # check if application is installed
+    if Codex.isInstalled app
 
-      $loaded_apps.each do |app|
+      if not Codex.alreadyRestored app
 
-        # check if application is installed
-        if Codex.isInstalled app
+        # check if local files exist, overwrite with cloud-synced files?
+        app['paths'].each_with_index do |path, index|
 
-          #puts "#{app['name']} seems to be installed. Restoring..."
+          path = Codex.tildeToHomeFolder path
+          codex_path = Codex.getCodexPath(path)
+          type = Codex.getType(path)
 
-          # check if local files exist, overwrite with cloud-synced files?
-          app['paths'].each_with_index do |path, index|
-
-            path = Codex.tildeToHomeFolder path
-            codex_path = Codex.getCodexPath(path)
-            type = Codex.getType(path)
-
-            # Check if file is not already symlinked
-            if not Codex.alreadyRestored path
-
-              begin
-                # remove local file/folder
-                if type === 'file'
-                  FileUtils.rm path
-                elsif type === 'folder'
-                  FileUtils.rm_r path
-                end
-                # link .codex path to system path
-                FileUtils.symlink(codex_path, Codex.parentDirectory(path))
-                puts "\u2714 #{app['name']} is successfuly restored!"
-              rescue
-                # TODO: write rescue code to ensure no data was lost!
-                puts "\u2757 something went wrong! #{$!}"
-                errors << $!
-              end
-
-            else
-              if index === app['paths'].size - 1
-                puts "\u2714 #{app['name']} is already restored and linked."
-              end
+          begin
+            # remove local file/folder
+            if type === 'file'
+              FileUtils.rm path
+            elsif type === 'folder'
+              FileUtils.rm_r path
             end
-
+            # link .codex path to system path
+            FileUtils.symlink(codex_path, Codex.parentDirectory(path))
+            puts "\u2714 #{app['name']} is successfuly restored!"
+          rescue
+            # TODO: write rescue code to ensure no data was lost!
+            puts "\u2757 something went wrong! #{$!}"
+            errors << $!
           end
 
-          restored_apps << app
-
-        else
-          if $loaded_apps.size === 1
-            puts "You don't seem to have #{app['name']} installed."
-            exit 0
-          end
         end
 
-      end
-
-      if errors.empty?
-        puts "\u2714 #{restored_apps.size} application(s) have been restored!"
       else
-        puts "\u2757 #{restored_apps.size} application(s) have been restored, but with #{errors.length} error(s)."
+        puts "\u2714 #{app['name']} is already restored and linked."
       end
 
     end
@@ -173,41 +136,34 @@ module Codex extend self
   end
 
   # This function will remove the symlink and COPY the codex file/folder to the local system
-  def unlink
+  def unlink(app)
 
-    if not $loaded_apps.empty?
+    app['paths'].each do |path|
 
-      $loaded_apps.each do |app|
+      path = Codex.tildeToHomeFolder path
+      codex_path = Codex.getCodexPath(path)
+      type = Codex.getType(path)
 
-        app['paths'].each do |path|
+      begin
 
-          path = Codex.tildeToHomeFolder path
-          codex_path = Codex.getCodexPath(path)
-          type = Codex.getType(path)
-
-          begin
-
-            # remove linked file on local system
-            if type === 'folder'
-              FileUtils.rm(path)
-              # copy the codex file to the local system
-              FileUtils.cp_r(codex_path, path)
-            elsif type === 'file'
-              FileUtils.rm(path)
-              # copy the codex file to the local system
-              FileUtils.copy(codex_path, path)
-            end
-
-          rescue
-            # TODO: write rescue code to ensure no data was lost!
-            puts "\u2757 something went wrong! #{$!}"
-          end
-
+        # remove linked file on local system
+        if type === 'folder'
+          FileUtils.rm(path)
+          # copy the codex file to the local system
+          FileUtils.cp_r(codex_path, path)
+        elsif type === 'file'
+          FileUtils.rm(path)
+          # copy the codex file to the local system
+          FileUtils.copy(codex_path, path)
         end
 
+      rescue
+        # TODO: write rescue code to ensure no data was lost!
+        puts "\u2757 something went wrong! #{$!}"
       end
 
     end
+
   end
 
 end

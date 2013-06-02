@@ -40,17 +40,39 @@ module Codex extend self
     File.expand_path("..", path)
   end
 
-  def alreadyBackedUp(folder)
-    File.exists? Codex.getCodexPath(folder)
+  def alreadyBackedUp(app)
+    # asume it's not
+    backedup = false
+    app['paths'].each do |path|
+      # one or more paths found
+      if File.exists? Codex.getCodexPath(path)
+        backedup = true
+      end
+    end
+    return backedup
   end
 
-  def alreadyRestored(folder)
-    File.symlink? Codex.folderToFile folder
+  def alreadyRestored(app)
+    # asume it's not
+    restored = false
+    app['paths'].each do |path|
+      path = Codex.tildeToHomeFolder path
+      # one or more paths found
+      if File.symlink? Codex.folderToFile(path)
+        restored = true
+      end
+    end
+    return restored
+  end
+
+  def folderToFile(path)
+    path.chomp('/')
   end
 
   # check if application is installed, at least one file in paths has to exist
   # also check if maybe it has been symlinked
   def isInstalled(app)
+    # assume it's false by default
     installed = false
     app['paths'].each do |path|
       path = Codex.tildeToHomeFolder path
@@ -59,10 +81,6 @@ module Codex extend self
       end
     end
     return installed
-  end
-
-  def folderToFile(path)
-    path.chomp('/')
   end
 
 end
