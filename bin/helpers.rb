@@ -48,12 +48,13 @@ module Codex extend self
     File.symlink? Codex.folderToFile folder
   end
 
-  # check if application is installed
-  # at least one file in paths has to match
+  # check if application is installed, at least one file in paths has to exist
+  # also check if maybe it has been symlinked
   def isInstalled(app)
     installed = false
     app['paths'].each do |path|
-      if File.exists? Codex.tildeToHomeFolder(path)
+      path = Codex.tildeToHomeFolder path
+      if File.exists? path or File.symlink? path
         installed = true
       end
     end
