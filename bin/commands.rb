@@ -130,7 +130,7 @@ module Codex extend self
               begin
                 # remove local file/folder
                 if type === 'file'
-                  FileUtils.rmdir path
+                  FileUtils.rm path
                 elsif type === 'folder'
                   FileUtils.rm_r path
                 end
@@ -172,7 +172,39 @@ module Codex extend self
 
   end
 
+  # This function will remove the symlink and COPY the codex file/folder to the local system
   def unlink
+
+    $loaded_apps.each do |app|
+
+      app['paths'].each do |path|
+
+        path = Codex.tildeToHomeFolder path
+        codex_path = Codex.getCodexPath(path)
+        type = Codex.getType(path)
+
+        begin
+
+          # remove linked file on local system
+          if type === 'folder'
+            FileUtils.rm(path)
+            puts "Removing folder #{path}"
+            FileUtils.cp_r(codex_path, path)
+          elsif type === 'file'
+            FileUtils.rm(path)
+            # copy the codex file to the local system
+            FileUtils.copy(codex_path, path)
+            puts "Removing file #{path}"
+          end
+
+        rescue
+          # TODO: write rescue code to ensure no data was lost!
+          puts "\u2757 something went wrong! #{$!}"
+        end
+
+      end
+
+    end
 
   end
 
