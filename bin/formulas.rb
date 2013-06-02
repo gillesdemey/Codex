@@ -18,9 +18,10 @@ module Formulas extend self
     formula = JSON.load( IO.read(f) )
 
     # run a quick sanity check
-    if formula['paths'].instance_of? Array and not formula['name'].nil?
+    if isSane formula
       $loaded_apps << formula
     else
+      # config file not sane
       puts "Manuscript file #{f} is invalid."
     end
   end
@@ -39,6 +40,22 @@ module Formulas extend self
   # TODO: write update formulas function
   def updateFormulas
     puts "Fetching formulas..."
+  end
+
+  def isSane(formula)
+    sane = true
+    # not an array
+    if not formula['paths'].instance_of? Array
+      sane = false
+    end
+    # no name node found
+    if formula['name'].nil?
+      sane = false
+    # name is empty
+    elsif formula['name'].empty?
+      sane = false
+    end
+    return sane
   end
 
 end
