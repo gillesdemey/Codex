@@ -31,7 +31,7 @@ backup
 ----
 
 ```
-ruby bin/codex.rb backup [application]
+ruby bin/codex.rb backup [optional: application]
 ```
 
 This function will **move all the installed applications settings** that Codex has a Manuscript for to your codex folder **and link the folders**.
@@ -40,7 +40,7 @@ restore
 ----
 
 ```
-ruby bin/codex.rb restore [application]
+ruby bin/codex.rb restore [optional: application]
 ```
 
 This function will restore all your application settings from your codex folder to your local system and **link them**.
@@ -54,7 +54,7 @@ unlink
 ----
 
 ```
-ruby bin/codex.rb unlink [application]
+ruby bin/codex.rb unlink [optional: application]
 ```
 
 This function will restore all your application settings from your dropbox folder to your local system, **your settings will still be in your codex folder**, but they will no longer be linked.

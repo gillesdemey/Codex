@@ -62,7 +62,7 @@ module Codex extend self
                 end
 
               else
-                puts "\u2714 #{app['name']} is already safe in the cloud."
+                puts "\u2714 #{app['name']} is already safe in the cloud. Use --force to overwrite."
               end
 
             end
