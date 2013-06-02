@@ -14,7 +14,15 @@ module Formulas extend self
 
   # Load a certain formula into the supported apps global
   def loadFormula(f)
-    $loaded_apps << JSON.load( IO.read(f) )
+
+    formula = JSON.load( IO.read(f) )
+
+    # run a quick sanity check
+    if formula['paths'].instance_of? Array and not formula['name'].nil?
+      $loaded_apps << formula
+    else
+      puts "Manuscript file #{f} is invalid."
+    end
   end
 
   # Discover all installed formulas

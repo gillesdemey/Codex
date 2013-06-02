@@ -1,4 +1,9 @@
 {
   "name": "bash",
-  "paths": ["~/.bash_history", "~/.bash_profile", "~/.bashrc"]
+  "paths": [ "~/.bash_aliases",
+             "~/.bash_logout",
+             "~/.bashrc",
+             "~/.profile",
+             "~/.bash_profile",
+             "~/.inputrc"]
 }

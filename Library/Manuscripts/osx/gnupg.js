@@ -1,0 +1,4 @@
+{
+  "name": "GnuPG",
+  "paths": ["~/.gnupg"]
+}

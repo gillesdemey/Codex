@@ -1,0 +1,4 @@
+{
+  "name": "Boto",
+  "paths": ["~/.boto"]
+}
