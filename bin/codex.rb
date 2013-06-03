@@ -6,6 +6,9 @@
 # codex [backup | restore ] [FORMULA...]      #
 ###############################################
 
+require 'rubygems'
+require 'bundler/setup'
+
 require 'json'
 require 'fileutils'
 require_relative 'helpers.rb'

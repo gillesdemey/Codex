@@ -23,7 +23,7 @@ module Codex extend self
               unlink(app)
           end
 
-          #TODO: verbose output that everythign was ok, or errors happend
+          #TODO: verbose output that everything was ok, or errors happend
 
         end
 
