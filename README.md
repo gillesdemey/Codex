@@ -1,6 +1,8 @@
 Codex
 =====
 
+[![Code Climate](https://codeclimate.com/github/gillesdemey/Codex.png)](https://codeclimate.com/github/gillesdemey/Codex)
+
 Backup your application settings and dotfiles with ease.
 ----
 
