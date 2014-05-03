@@ -1,2 +1,6 @@
 # bundler
 .bundle
+
+vendor/
+
+.DS_Store
