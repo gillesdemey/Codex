@@ -30,7 +30,7 @@ module Formulas extend self
   # TODO: Fetch formulas from git repo
   def discoverFormulas
     begin
-      $formulas = Dir.glob("#{MANUSCRIPT_PATH}/#{OS.name}/*.js")
+      $formulas = Dir.glob("#{MANUSCRIPT_PATH}/#{OS.name}/*.json")
     rescue
       puts "\2757 Couldn't discover formulas. #{$!}"
     end

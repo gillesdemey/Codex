@@ -22,7 +22,7 @@ to access Codex functions.
 Configuration
 =====
 
-Edit config/config.js however you want.
+Edit config/config.json however you want.
 
 Usage
 ======

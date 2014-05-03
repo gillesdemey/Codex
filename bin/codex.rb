@@ -38,7 +38,7 @@ COMMANDS = {
 
 $formulas = []
 $loaded_apps = []
-$config = JSON.load( IO.read('config/config.js') )
+$config = JSON.load( IO.read('config/config.json') )
 
 # Common paths
 PREFERENCES = '~/Library/Preferences/'
