@@ -1,0 +1,7 @@
+{
+  "name": "Spectacle",
+  "paths": [
+      "~/Library/Application Support/Spectacle",
+      "~/Library/Preferences/com.divisiblebyzero.Spectacle.plist"
+    ]
+}

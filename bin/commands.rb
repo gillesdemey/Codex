@@ -68,7 +68,7 @@ module Codex extend self
           puts "\u2714 #{app['name']} is secured in the cloud!"
         rescue
           # TODO: write rescue code to ensure no data was lost!
-          puts "\2757 something went wrong! #{$!}"
+          puts "\u2757 something went wrong! #{$!}"
           errors << $!
           $loaded_apps.delete(app)
         end

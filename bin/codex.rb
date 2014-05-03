@@ -11,6 +11,8 @@ require 'bundler/setup'
 
 require 'json'
 require 'fileutils'
+
+# TODO: refactor require_relative for Ruby 1.8.7
 require_relative 'helpers.rb'
 require_relative 'commands.rb'
 require_relative 'formulas.rb'
@@ -24,10 +26,10 @@ CODEX_VERSION = '0.1'
 # Words used to trigger actions
 
 COMMANDS = {
-  backup: 'backup',
-  restore: 'restore',
-  unlink: 'unlink',
-  update: 'update'
+  :backup => 'backup',
+  :restore => 'restore',
+  :unlink => 'unlink',
+  :update => 'update'
 }
 
 #################
